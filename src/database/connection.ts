@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config";
 
-const sequelize = new Sequelize(envConfig.connectionString as string);
+const sequelize = new Sequelize("postgresql://postgres.epqcndohwcldxhqoqxev:hahahehe@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres");
 
 try {
     sequelize.authenticate().then(() => {
