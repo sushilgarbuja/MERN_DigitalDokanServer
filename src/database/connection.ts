@@ -1,7 +1,11 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config";
 
-const sequelize = new Sequelize("postgresql://postgres.epqcndohwcldxhqoqxev:hahahehe@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres");
+const sequelize = new Sequelize(process.env.DATABASE_URL as string,{
+   
+    models: [__dirname + '/models'],
+    
+});
 
 try {
     sequelize.authenticate().then(() => {
@@ -13,5 +17,7 @@ try {
 } catch (err) {
     console.error("Unable to connect to the database:", err);
 }
-
+sequelize.sync({force : false,alter:false}).then(()=>{
+    console.log("synced !!")
+}) 
 export default sequelize
