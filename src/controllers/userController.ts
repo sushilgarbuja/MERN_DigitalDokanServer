@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import User from '../database/models/userModel';
 import generateToken from '../services/jenerateToken';
 import bcrypt from 'bcrypt';
+import generateOtp from '../services/generateOtp';
+import sendMail from '../services/sendMail';
 
 class AuthController {
     public static async UserRegister(req: Request, res: Response): Promise<void> {
@@ -46,8 +48,45 @@ class AuthController {
                  });
             }
         }
+        
     }
-    
+    public static async forgotPassword(req: Request, res: Response): Promise<void> {
+        const { email } = req.body;
+        if (!email) {
+            res.status(400).json({ message: "Please provide an email" });
+            return;
+        }
+        const users = await User.findAll({
+            where: {
+                email: email
+            }
+        });
+        if (users.length === 0) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        } else {
+            const otp = generateOtp();
+            await sendMail({
+                to: email,
+                subject: "Password Reset OTP",
+                text: `Your OTP is ${otp}`
+            });
+            users[0].otp = otp.toString();
+            users[0].otpGeneratedTime = new Date().toString();
+            await users[0].save();
+
+            res.status(200).json({ message: "OTP sent successfully" });
+            
+        }
+    }
+    verigyOtp(req:Request, res:Response){
+        const {otp,email}=req.body;
+        if(!otp || !email){
+            res.status(400).json({ message: "Please provide all fields" });
+            return;
+        }
+        const 
+    }
 }
 
 // Export the class itself, not an instance
