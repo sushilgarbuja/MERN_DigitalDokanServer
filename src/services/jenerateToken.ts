@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { envConfig } from '../config/config';
 
-const generateToken = (userId: string) => {
+const generateToken = (userId: string, secretKey: string, expiresIn: string) => {
     //@ts-ignore
     const token = jwt.sign({ userId: userId }, envConfig.jwtSecret as string,
         {

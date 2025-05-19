@@ -4,6 +4,9 @@ import generateToken from '../services/jenerateToken';
 import bcrypt from 'bcrypt';
 import generateOtp from '../services/generateOtp';
 import sendMail from '../services/sendMail';
+import findData from '../services/findData';
+import sendResponse from '../services/sendResponse';
+import checkOptExpiration from '../services/checkOtpExpiration';
 
 class AuthController {
     public static async UserRegister(req: Request, res: Response): Promise<void> {
@@ -17,14 +20,12 @@ class AuthController {
     }
 
     public static async login(req: Request, res: Response): Promise<void> {
-        // Accept incoming data -> email, password
         const { email, password } = req.body;
         if (!email || !password) {
             res.status(400).json({ message: "Please provide all fields" });
             return;
         }
     
-        // Check if email exists
         const users = await User.findAll({
             where: {
                 email: email
@@ -35,21 +36,21 @@ class AuthController {
             res.status(404).json({ message: "User not found" });
             return;
         } else {
-            const user = users[0]; // Access the first user in the array
+            const user = users[0];
             const isPasswordValid = bcrypt.compareSync(password, user.password);
             if (!isPasswordValid) {
                 res.status(401).json({ message: "Invalid password" });
                 return;
             } else {
-
-                 const token = generateToken(user.id); // Use user.id here
-                res.status(200).json({ message: "Login successful",
-                    token
-                 });
+                // Assuming generateToken requires userId, secretKey, and expiresIn
+                const secretKey = 'your-secret-key'; // Replace with your actual secret key
+                const expiresIn = '1h'; // Replace with your desired expiration time
+                const token = generateToken(user.id, secretKey, expiresIn);
+                res.status(200).json({ message: "Login successful", token });
             }
         }
-        
     }
+
     public static async forgotPassword(req: Request, res: Response): Promise<void> {
         const { email } = req.body;
         if (!email) {
@@ -76,18 +77,55 @@ class AuthController {
             await users[0].save();
 
             res.status(200).json({ message: "OTP sent successfully" });
-            
         }
     }
-    verigyOtp(req:Request, res:Response){
-        const {otp,email}=req.body;
-        if(!otp || !email){
+
+    public static async verigyOtp(req: Request, res: Response) {
+        const { otp, email } = req.body;
+        if (!otp || !email) {
             res.status(400).json({ message: "Please provide all fields" });
             return;
         }
-        const 
+        const user = await findData(User, email);
+        if (!user) {
+            sendResponse(res, 404, "User not found");
+            return;
+        }
+        //otp verification
+       const [data]= await User.findAll({
+        where:{
+            otp,
+            email
+        }
+       })
+       if(!data){
+        sendResponse(res, 400, "Invalid OTP");
+        return;
+       }
+      const otpGeneratedTime=data.otpGeneratedTime;
+      checkOptExpiration(res,otpGeneratedTime,120000);
     }
+public static async resetPassword(req:Request,res:Response){
+    const {newPassword,confirmPassword,email,otp}=req.body
+    if(!newPassword || !confirmPassword || !email || !otp){
+        sendResponse(res,400,"Please provide all fields")
+        return
+    }
+    if(newPassword!==confirmPassword){
+        sendResponse(res,400,"New password and confirm password does not match");
+        return;
+    }
+   const user = await findData(User,email)
+   if(!user){
+    sendResponse(res,404,"User not found");
+    return;
+   }
+   user.password=bcrypt.hashSync(newPassword,10)
+   user.otp=""
+   user.otpGeneratedTime=""
+   await user.save()
+   sendResponse(res,200,"Password reset successfully");
+}
 }
 
-// Export the class itself, not an instance
 export default AuthController;
