@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../database/models/userModel';
-import generateToken from '../services/jenerateToken';
+import generateToken from '../services/generateToken';
 import bcrypt from 'bcrypt';
 import generateOtp from '../services/generateOtp';
 import sendMail from '../services/sendMail';
@@ -15,6 +15,17 @@ class AuthController {
             res.status(400).json({ message: "Please provide all fields" });
             return;
         }
+        //check if user already exists
+        const [data]= await User.findAll({
+        where:{
+            email:email
+        }
+    })
+    if(data){
+        res.status(400).json({ message: "User already exists" });
+        return;
+    }
+
         await User.create({ email, username, password: bcrypt.hashSync(password, 10) });
         res.status(200).json({ message: "User created successfully" });
     }
@@ -126,6 +137,7 @@ public static async resetPassword(req:Request,res:Response){
    await user.save()
    sendResponse(res,200,"Password reset successfully");
 }
+
 }
 
 export default AuthController;
