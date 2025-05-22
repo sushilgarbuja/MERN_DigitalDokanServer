@@ -31,6 +31,8 @@ class CategoryController {
     }
 
     async addCategory(req: AddCategoryRequest, res: Response): Promise<void> {
+        //@ts-ignore
+        console.log(req.userId);
         const { categoryName } = req.body;
         if (!categoryName) {
             res.status(400).json({ message: "Please provide category name" });
