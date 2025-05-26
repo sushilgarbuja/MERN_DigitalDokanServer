@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config";
+import Product from "./models/productModel";
+import Category from "./models/categoryModel";
 
 const sequelize = new Sequelize(process.env.DATABASE_URL as string,{
    
@@ -20,4 +22,9 @@ try {
 sequelize.sync({force : false,alter:false}).then(()=>{
     console.log("synced !!")
 }) 
+
+//relationship//
+Product.belongsTo(Category,{foreignKey:'categoryId'})
+Category.hasOne(Product,{foreignKey:'categoryId'})
+
 export default sequelize
