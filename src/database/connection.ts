@@ -2,6 +2,10 @@ import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config";
 import Product from "./models/productModel";
 import Category from "./models/categoryModel";
+import Order from "./models/orderModel";
+import User from "./models/userModel";
+import Payment from "./models/paymentModel";
+import OrderDetails from "./models/orderDetails";
 
 const sequelize = new Sequelize(process.env.DATABASE_URL as string,{
    
@@ -26,5 +30,20 @@ sequelize.sync({force : false,alter:false}).then(()=>{
 //relationship//
 Product.belongsTo(Category,{foreignKey:'categoryId'})
 Category.hasOne(Product,{foreignKey:'categoryId'})
+
+//user x order
+User.hasMany(Order,{foreignKey:'userId'})
+Order.belongsTo(User,{foreignKey:'userId'})
+
+//Payment x order
+Payment.belongsTo(Order,{foreignKey:'orderId'})
+Order.hasOne(Payment,{foreignKey:'orderId'})
+
+Order.hasOne(OrderDetails,{foreignKey:'orderId'})
+OrderDetails.belongsTo(Order,{foreignKey:'orderId'})
+
+Product.hasMany(OrderDetails,{foreignKey:'productId'})
+OrderDetails.belongsTo(Product,{foreignKey:'productId'})
+
 
 export default sequelize
