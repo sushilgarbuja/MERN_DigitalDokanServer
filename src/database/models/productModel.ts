@@ -1,51 +1,53 @@
-import { Table, Column, Model, DataType, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, AllowNull, PrimaryKey, Default } from 'sequelize-typescript';
 
 @Table({
-    tableName: 'products',
-    modelName: 'Product',
-    timestamps: true,
+  tableName: 'products',
+  modelName: 'Product',
+  timestamps: true,
 })
 class Product extends Model {
-    @Column({
-        primaryKey: true,
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-    })
-    id!: string; // Use '!' to indicate that this property will be initialized
+  @PrimaryKey
+  @Default(DataType.UUIDV4)
+  @Column({
+    type: DataType.UUID,
+  })
+  declare id: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-   productName!: string;
+  @AllowNull(false)
+  @Column({
+    type: DataType.STRING,
+  })
+  declare productName: string;
 
-    @Column({
-        type: DataType.STRING,
-    })
-    productDescription!: string;
+  @AllowNull(true)
+  @Column({
+    type: DataType.STRING,
+  })
+  declare productDescription?: string;
 
-    @Column({
-        type: DataType.FLOAT,
-        allowNull: false,
-    })
-    productPrice!: number;
+  @AllowNull(false)
+  @Column({
+    type: DataType.FLOAT,
+  })
+  declare productPrice: number;
 
-    @Column({
-        type: DataType.INTEGER
-    })
-    productTotalStock!: number;
+  @AllowNull(true)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare productTotalStock?: number;
 
-    @Column({
-        type:DataType.INTEGER,
-        allowNull:false
-    })
-    discount!:number;
+  @AllowNull(false)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare discount: number;
 
-    @Column({
-      type:DataType.STRING  
-    })
-    productImage!:string
-
+  @AllowNull(true)
+  @Column({
+    type: DataType.STRING,
+  })
+  declare productImage?: string;
 }
 
-export default Product;
+export default Product;// try this

@@ -25,6 +25,12 @@ class Payment extends Model{
         defaultValue:PaymentStatus.unpaid,
     })
     declare paymentStatus:string
+
+    @Column({
+        type: DataType.STRING,
+
+    })
+    declare pidx:string
 }
 
 export default Payment
