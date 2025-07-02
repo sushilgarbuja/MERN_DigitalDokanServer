@@ -11,7 +11,11 @@ import categoryRoute from './routes/categoryRoute'
 import productRoute from './routes/productRoute'
 import orderRoute from './routes/orderRoutes'
 import cardRoute from './routes/cartRoutes'
+import cors from 'cors';
 
+app.use(cors({
+    origin:"*",
+}))
 
 
 app.use(express.json());

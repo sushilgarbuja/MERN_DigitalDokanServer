@@ -26,8 +26,20 @@ class AuthController {
         return;
     }
 
-        await User.create({ email, username, password: bcrypt.hashSync(password, 10) });
-        res.status(200).json({ message: "User created successfully" });
+     const user =   await User.create({
+             email,
+             username,
+             password: bcrypt.hashSync(password, 10),
+             });
+
+        await sendMail({
+            to: email,
+            subject: "Account Created",
+            text: `Your account has been created successfully`
+        })     
+        res.status(200).json({ message: "User created successfully",
+            // data:user
+         });
     }
 
     public static async login(req: Request, res: Response): Promise<void> {
