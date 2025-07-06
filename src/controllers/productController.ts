@@ -13,7 +13,7 @@ class ProductController{
         try{
             const {productName,productDescription,productPrice,productTotalStock,discount,categoryId}=req.body
         console.log(req.file);
-        const filename=req.file?req.file.filename:'https://weimaracademy.org/wp-content/uploads/2021/08/dummy-user.png'
+        const filename = req.file ? `http://localhost:4000/${req.file.filename}` : 'https://weimaracademy.org/wp-content/uploads/2021/08/dummy-user.png';
         if(!productName || !productDescription || !productPrice || !productTotalStock || !categoryId){
             res.status(400).json({ message: "Please provide all fields" });
             return;
