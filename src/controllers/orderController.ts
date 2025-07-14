@@ -4,6 +4,7 @@ import Order from "../database/models/orderModel";
 import OrderDetails from "../database/models/orderDetails";
 import Payment from "../database/models/paymentModel";
 import axios from "axios";
+import Cart from "../database/models/cartModels";
 
 interface IProduct {
   productId: string;
@@ -18,38 +19,62 @@ interface OrderRequest extends Request {
 
 class OrderController {
   // 🧾 Create Order
-  public static async createOrder(req: OrderRequest, res: Response) {
+  public static async createOrder(req: OrderRequest, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
 
       const {
         phoneNumber,
-        shippingAddress,
+        firstName,
+        lastName,
+        email,
+        city,
+        addressLine,
+        state,
+        zipCode,
         totalAmount,
         paymentMethod,
-        products,
-      }: {
-        phoneNumber: string;
-        shippingAddress: string;
-        totalAmount: number;
-        paymentMethod: PaymentMethod;
-        products: IProduct[];
-      } = req.body;
+      }= req.body;
+      const products: IProduct[] = req.body.products
+      console.log(req.body);
 
-      if (!phoneNumber || !shippingAddress || !totalAmount || !products.length) {
-        return res.status(400).json({
-          message: "Please provide phoneNumber, shippingAddress, totalAmount, and products",
+      if (!phoneNumber || !city ||!addressLine ||!state ||!zipCode || !totalAmount || products.length==0|| !firstName || !lastName || !email) {
+        res.status(400).json({
+          message: "Please provide all required fields",
         });
+        return;
       }
 
       // 🛒 Step 1: Create Order
       const orderData = await Order.create({
         phoneNumber,
-        shippingAddress,
+        city,
+        state,
+        zipCode,
+        addressLine,
         totalAmount,
         userId,
+        firstName,
+        lastName,
+        email
       });
 
+      let data;
+      //for order details
+      for (const product of products) {
+  await OrderDetails.create({
+    productId: product.productId,
+    quantity: product.productQty,
+    orderId: orderData.id,
+  });
+
+  await Cart.destroy({
+    where: {
+      productId: product.productId,
+      userId: userId,
+    },
+  });
+}
       // 🧾 Step 2: Add Order Details
       for (const product of products) {
         await OrderDetails.create({
@@ -93,32 +118,34 @@ class OrderController {
         paymentData.pidx = pidx;
         await paymentData.save();
 
-        return res.status(200).json({
+        res.status(200).json({
           message: "Khalti payment initiated",
           paymentUrl: payment_url,
           pidx,
+          data,
         });
       }
 
       // 🟡 Esewa Placeholder
       if (paymentMethod === PaymentMethod.esewa) {
-        return res.status(200).json({
-          message: "Esewa payment integration coming soon",
+      res.status(200).json({
+          message: "Order created successfully with Esewa",
+          data,
         });
       }
 
       // ✅ COD (Cash on Delivery)
       if (paymentMethod === PaymentMethod.COD) {
-        return res.status(200).json({
+         res.status(200).json({
           message: "Order created successfully with Cash on Delivery",
         });
       }
 
-      return res.status(400).json({ message: "Invalid payment method selected" });
+     res.status(400).json({ message: "Invalid payment method selected" });
 
     } catch (error) {
       console.error("Error creating order:", error);
-      return res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
     }
   }
 

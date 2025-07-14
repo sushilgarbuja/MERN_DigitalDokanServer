@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Cart from '../database/models/cartModels';
 import Product from '../database/models/productModel';
+import Category from '../database/models/categoryModel';
 
 // CartController
 
@@ -37,7 +38,26 @@ class CartController {
             quantity
         })
         }
-        res.status(200).json({ message: "Item added to cart successfully" });
+        const cartData = await Cart.findAll({
+            where:{
+                userId
+            },
+            include:[
+                {
+                    model:Product,
+                    include:[
+                        {
+                            model:Category,
+                            
+                        }
+                    ]
+                }
+            ]
+
+        })
+        res.status(200).json({ message: "Item added to cart successfully",
+            data: cartData
+         });
         //select * from cart where productid =? and userid = ?
         
         
@@ -67,21 +87,26 @@ class CartController {
 
     // Remove item from cart
     async deleteMycartItem(req: AuthRequest, res: Response) {
-        const userId = req.user?.id;
-        const { productId } = req.params;
-        const product = await Product.findByPk(productId);
-        if (!product) {
-            res.status(404).json({ message: "Product not found" });
-            return;
-        }
-        await Cart.destroy({
-            where: {
-                userId,
-                productId
-            }
-        });
-        res.status(200).json({ message: "Item removed from cart successfully" });
-    }
+  const userId = req.user?.id;
+  const { productId } = req.params;
+  const cartItem = await Cart.findOne({
+    where: {
+      userId,
+      productId, // Changed productId to id
+    },
+  });
+  if (!cartItem) {
+    res.status(404).json({ message: "Cart item not found" });
+    return;
+  }
+  await Cart.destroy({
+    where: {
+      userId,
+      productId,
+    },
+  });
+  res.status(200).json({ message: "Item removed from cart successfully" });
+}
 
     //update cart item quantity
     async updateCartItemQuantity(req: AuthRequest, res: Response) {

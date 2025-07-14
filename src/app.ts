@@ -28,6 +28,7 @@ app.use('/api/cart',cardRoute)
 
 
 
+
 app.use(express.static('./src/uploads'));
 
 export default app;

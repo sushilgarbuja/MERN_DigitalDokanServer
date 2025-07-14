@@ -28,10 +28,29 @@ class Order extends Model {
 
     @Column({
         type: DataType.STRING,
-        allowNull: false,
+    })
+    declare AddressLine: string;
+   
+    @Column({
+        type: DataType.STRING,
+    })
+    declare City: string;
+    @Column({
+        type: DataType.STRING,
+    })
+    declare State: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare zipCode: string;
+
+    @Column({
+        type: DataType.STRING,
+  
     })
     declare shippingAddress: string;
-
+    
     @Column({
         type: DataType.FLOAT,
         allowNull: false,
@@ -43,6 +62,27 @@ class Order extends Model {
         defaultValue: OrderStatus.Pending,
     })
     declare orderStatus: string;
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+        defaultValue:"Anoymous",
+    })
+    declare firstName: string;
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+        defaultValue:"Anoymous",
+
+    })
+
+    declare lastName: string;
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+        defaultValue:"anoymous@gmail.com",
+
+    })
+    declare email: string;
 }
 
 export default Order;
