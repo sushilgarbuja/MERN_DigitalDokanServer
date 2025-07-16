@@ -50,4 +50,4 @@ class Product extends Model {
   declare productImage?: string;
 }
 
-export default Product;// try this
+export default Product;

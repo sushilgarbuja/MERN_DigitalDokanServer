@@ -31,7 +31,7 @@ class OrderController{
         console.log(req.body)
         if(!phoneNumber || !city || !addressLine || !state || !zipCode || !totalAmount || products.length == 0 || !firstName || !lastName || !email ){
             res.status(400).json({
-                message : "Please provide phoneNumber,shippingAddress,totalAmount,products"
+                message : "Please provide all the details"
             })
             return
         }
@@ -39,7 +39,6 @@ class OrderController{
         
         let data; 
         const paymentData = await Payment.create({
-     
           paymentMethod : paymentMethod, 
       })
       const orderData = await Order.create({
@@ -75,7 +74,6 @@ class OrderController{
 
      if (paymentMethod == PaymentMethod.khalti){
         // khalti logic
-        
         const data = {
           return_url : "http://localhost:5173/", 
           website_url : "http://localhost:5173/", 
@@ -83,21 +81,22 @@ class OrderController{
           purchase_order_id : orderData.id, 
           purchase_order_name : "order_" + orderData.id
         }
-       const response =  await axios.post("https://a.khalti.com/api/v2/epayment/initiate/",data,{
+       const response =  await axios.post("https://dev.khalti.com/api/v2/epayment/initiate/",data,{
           headers : {
-            Authorization : "Key b71142e3f4fd4da8acccd01c8975be38"
+            Authorization : "Key fc83bf18e5f94f068b508c09a2ad5d33",
+            "Content-Type": "application/json",
           }
         })
-      const khaltiResponse = response.data 
-      paymentData.pidx = khaltiResponse.pidx
+      const {pidx,payment_url} = response.data 
+      paymentData.pidx = pidx
       paymentData.save()
       res.status(200).json({
         message : "Order created successfully", 
-        url : khaltiResponse.payment_url, 
-        pidx : khaltiResponse.pidx,  
+        paymentUrl: payment_url,
+        pidx, 
         data
-
       })
+      console.log(data)
       }else if(paymentMethod == PaymentMethod.esewa){
 
       }else{
@@ -116,11 +115,11 @@ class OrderController{
         })
         return
       }
-      const response = await axios.post("https://a.khalti.com/api/v2/epayment/lookup/",{
+      const response = await axios.post("https://dev.khalti.com/api/v2/epayment/lookup/",{
         pidx : pidx
       },{
         headers : {
-          "Authorization" : "Key b71142e3f4fd4da8acccd01c8975be38"
+          "Authorization" : "Key fc83bf18e5f94f068b508c09a2ad5d33"
         }
       })
       const data = response.data 

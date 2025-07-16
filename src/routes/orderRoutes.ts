@@ -5,7 +5,7 @@ import errorHandler from '../services/errorHandler';
 
 const router: Router = express.Router();
 
-router.route('/').post( userMiddleware.isUserLoggedIn,errorHandler(OrderController.createOrder));
+router.route('/').post( userMiddleware.isUserLoggedIn,errorHandler(OrderController.createOrder)).get( userMiddleware.isUserLoggedIn,errorHandler(OrderController.fetchMyOrders));
 router.route('/verify-pidx').post(userMiddleware.isUserLoggedIn,errorHandler(OrderController.verifyTransaction))
 
 export default router;
