@@ -251,13 +251,12 @@ class OrderController{
       })
     }
     static async deleteOrder(req:OrderRequest, res:Response) : Promise<void>{
-
       const orderId = req.params.id 
       const order : OrderWithPaymentId= await Order.findByPk(orderId) as OrderWithPaymentId
       const paymentId = order?.paymentId
       if(!order){
         res.status(404).json({
-          message : "You dont have that orderId order"
+          message : "You don't have that orderId order"
         })
         return
       }
@@ -281,6 +280,11 @@ class OrderController{
       })
     }
 
+    
+
 }
+
+
+
 
 export default OrderController
