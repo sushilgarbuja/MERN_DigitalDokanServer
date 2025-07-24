@@ -103,7 +103,7 @@ class AuthController {
         }
     }
 
-    public static async verigyOtp(req: Request, res: Response) {
+    public static async verifyOtp(req: Request, res: Response) {
         const { otp, email } = req.body;
         if (!otp || !email) {
             res.status(400).json({ message: "Please provide all fields" });
@@ -148,6 +148,33 @@ public static async resetPassword(req:Request,res:Response){
    user.otpGeneratedTime=""
    await user.save()
    sendResponse(res,200,"Password reset successfully");
+}
+//fetch user
+public static async fetchUsers(req:Request,res:Response){
+    const users=await User.findAll({
+        attributes:["id","email","username"]
+    })
+    res.status(200).json({
+        message:"User fetched successfully",
+        data:users
+    })
+}
+
+//delete user
+public static async deleteUser(req:Request,res:Response){
+    const {id}=req.params
+    if(!id){
+        res.status(400).json({
+            message:"Please provide user id"
+        })
+        return
+    }
+    await User.destroy({
+        where:{id}
+    })
+    res.status(200).json({
+        message:"User deleted successfully"
+    })
 }
 
 }

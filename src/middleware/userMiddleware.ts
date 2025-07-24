@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { envConfig } from "../config/config";
 import User from "../database/models/userModel";
+
+
 export enum Role{
     admin="admin",
     customer="customer"

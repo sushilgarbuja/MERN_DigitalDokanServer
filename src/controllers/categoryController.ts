@@ -30,19 +30,26 @@ class CategoryController {
         }
     }
 
-    async addCategory(req: AddCategoryRequest, res: Response): Promise<void> {
+    async addCategory(req: Request, res: Response): Promise<void> {
         //@ts-ignore
         console.log(req.userId);
         const { categoryName } = req.body;
         if (!categoryName) {
-            res.status(400).json({ message: "Please provide category name" });
+            res.status(400).json({
+                message: "Please provide category name"
+            });
             return;
         }
 
         // Add logic to create a new category here
         // For example:
-        await Category.create({ categoryName });
-        res.status(201).json({ message: "Category added successfully" });
+        const category=await Category.create({
+            categoryName
+        });
+        res.status(201).json({
+            message: "Category added successfully",
+            data:category
+         });
     }
     async getCategory(req: Request, res: Response): Promise<void> {
         const data = await Category.findAll();
