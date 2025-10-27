@@ -18,7 +18,7 @@ function startServer() {
 
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:3000"
+            origin: "http://localhost:4000"
         }
     });
 
@@ -30,9 +30,11 @@ function startServer() {
     };
 
     io.on('connection', (socket) => {
-        const  token  = socket.handshake.headers.token;
+        console.log("User connected vayo");
+        const  {token}=socket.handshake.auth
+        console.log(token);
         if (token) {
-            console.log(token);
+            
             jwt.verify(token as string, envConfig.jwtSecret as string, async (err:any, result: any) => {
                 if (err) {
                     socket.emit("error", err);
@@ -49,8 +51,10 @@ function startServer() {
                 }
             })
         }else{
+            console.log("Triggered");
             socket.emit("error","Token not found")
         }
+
         socket.on("updateOrderStatus", async(data)=>{
             const{status,orderId,userId}=data;
             console.log("updateOrderStatus",data);
@@ -61,12 +65,16 @@ function startServer() {
            if(findUser){
            console.log(findUser);
 
-            io.to(findUser.socketId).emit("success","Order status updated",data);
+            io.to(findUser.socketId).emit(data);
            }else{
             socket.emit("error","User is not online")
            }
-        })  
+           console.log(onlineUsers)
+        })
+          
     });
+        
+
 }
 
 startServer();

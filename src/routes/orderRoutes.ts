@@ -8,6 +8,10 @@ const router: Router = express.Router();
 router.route('/').post( userMiddleware.isUserLoggedIn,errorHandler(OrderController.createOrder)).get( userMiddleware.isUserLoggedIn,errorHandler(OrderController.fetchMyOrders));
 
 
+
+router.route('/all').get(userMiddleware.isUserLoggedIn, userMiddleware.accessTo(Role.admin), errorHandler(OrderController.fetchAllOrders));
+
+
 router.route('/verify-pidx').post(userMiddleware.isUserLoggedIn,errorHandler(OrderController.verifyTransaction))
 
 router.route('/admin/change-status/:id').patch( userMiddleware.isUserLoggedIn,userMiddleware.restrictTo(Role.admin),errorHandler(OrderController.changeOrderStatus))

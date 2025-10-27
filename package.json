@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.ts"
+    "start": "nodemon server.ts"
   },
   "keywords": [],
   "author": "",

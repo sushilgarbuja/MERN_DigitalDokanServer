@@ -51,6 +51,8 @@ class CategoryController {
             data:category
          });
     }
+
+
     async getCategory(req: Request, res: Response): Promise<void> {
         const data = await Category.findAll();
         res.status(200).json({
@@ -58,6 +60,7 @@ class CategoryController {
             data
         })
     }
+    
     async deleteCategory(req: Request, res: Response): Promise<void> {
         const { id } = req.params;
         if(!id){

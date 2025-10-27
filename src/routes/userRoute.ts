@@ -11,7 +11,10 @@ router.route('/login').post(AuthController.login)
 router.route('/forgot-password').post(AuthController.forgotPassword)
 router.route('/verify-otp').post(AuthController.verifyOtp)
 router.route('/reset-password').post(AuthController.resetPassword)
+
 router.route('/users').get(userMiddleware.isUserLoggedIn,userMiddleware.accessTo(Role.admin),errorHandler( AuthController.fetchUsers))
-router.route('/users/:id').delete(userMiddleware.isUserLoggedIn,userMiddleware.accessTo(Role.admin),errorHandler( AuthController.deleteUser))
+
+
+router.route('/users/:id').delete(userMiddleware.isUserLoggedIn,userMiddleware.accessTo(Role.admin), AuthController.deleteUser)
 
 export default router;
